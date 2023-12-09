@@ -1,38 +1,451 @@
-.App {
+/* General Resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global Styles */
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  font-family: "Open Sans", sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  line-height: 1.6;
+  overflow-y: scroll; /* Always show vertical scrollbar */
+}
+
+/* Container Styles */
+.container {
+  width: 70%; /* Adjusted to 70% for large/x-large screens */
+  margin: auto;
+  max-width: 1200px;
+  text-align: center; /* Centering the container */
+}
+
+/* Text Center Styles */
+.text-center {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Navbar Styles */
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dddddd;
+  padding: 1rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.navbar-brand {
+  font-size: 1.5rem;
+  color: #004a94;
+  cursor: pointer;
+}
+
+/* Navigation Styles */
+.nav-item {
+  padding: 0.5rem 1rem;
+}
+
+.nav-link {
+  color: #5c5c5c;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #333;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+/* Footer Styles */
+.footer {
+  background-color: #1e90ff;
+  color: #ffffff;
+  text-align: center;
+  padding: 1rem 0;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.form-label {
+  margin: 0.5rem 0;
+}
+
+/* Table Styles */
+.table {
+  width: 90%; /* Adjusted to 70% for large/x-large screens */
+  margin: auto; /* Centering the table horizontally */
+  border-collapse: collapse;
+  table-layout: fixed; /* Prevent table from resizing columns */
+}
+
+@media (max-width: 768px) {
+  /* Adjust table width for small screens */
+  .table {
+    width: 90%;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.table thead {
+  background-color: #cb1eff;
+  color: #ffffff;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem;
+  border: 1px solid #dddddd;
+  vertical-align: middle;
+  text-align: center;
+  white-space: wrap;
+}
+
+/* Custom Checkbox Styles */
+.checkbox-column,
+.due-date-column {
+  width: 10% !important;
+  text-align: center;
+}
+
+.table .form-check-input {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  vertical-align: middle;
+}
+
+/* Button Styles */
+.btn {
+  background-color: #871eff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem;
+  cursor: pointer;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #c50dfd;
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  color: #333;
+  border: 1px solid #bf1eff;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f4f7f6;
+}
+
+/* Button Group Styles */
+.btn-group {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+/* Form Styles */
+.form-control {
+  max-width: 200px;
+  padding: 5px;
+  margin: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #cccccc;
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* Custom Scrollbar Styles for Webkit */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Student Info Styles */
+.student-info {
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.student-label {
+  margin-right: 1rem;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.student-fields {
+  display: flex;
+  align-items: center;
+}
+
+.small-input {
+  width: auto;
+  padding: 0.5rem;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* Centered Label Styles */
+.centered-label {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Date Picker Styles */
+.date-picker {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  margin-right: 1rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  position: relative;
+}
+
+.date-picker-wrapper {
+  position: relative;
+}
+
+.date-picker-wrapper::after {
+  content: "\f073";
+  font-family: "FontAwesome";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.date-picker input[type="text"] {
+  cursor: pointer;
+}
+
+/* Styles for the buttons to match the teacher dashboard */
+.btn-outline-secondary {
+  background-color: #fff;
+  color: #1e90ff;
+  border-color: #1e90ff;
+}
+
+.btn-outline-secondary:hover {
+  color: #fff;
+  background-color: #1e90ff;
+  border-color: #1e90ff;
+}
+
+.date-picker label {
+  margin-bottom: 0.5rem;
+}
+
+.student-dashboard-container,
+.teacher-dashboard-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* Center the DatePicker */
+.react-datepicker-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.react-datepicker__input-container {
+  display: inline-block;
+  text-align: center;
+}
+
+/* Increase the size of the DatePicker */
+.react-datepicker-popper {
+  z-index: 1000;
+}
+
+/* Adjust the size of the DatePicker input */
+.react-datepicker__input-container input {
+  width: 200px;
+  padding: 0.5rem;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* Adjust the size of the Due Date and Subject columns */
+.table th:nth-child(2),
+.table td:nth-child(2),
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 15%; /* Adjust as needed */
+}
+
+/* Adjust the size of the Description column */
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 40%; /* Adjust as needed */
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.6
+  ); /* Black with more opacity for darker overlay */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  position: relative;
+  background-color: #ffffff;
+  margin: 5% auto; /* Reduced top margin and centered */
+  padding: 40px; /* Increased padding for more space */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  width: 50%; /* Adjusted width for medium size */
+  max-width: 600px; /* Maximum width */
   }
-  to {
-    transform: rotate(360deg);
+
+/* The Close Button */
+.close {
+  color: #707070;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 30px; /* Increased size */
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #ff4444; /* Change color on hover/focus for better visibility */
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    width: 90%; /* Full width on smaller screens */
+    margin: 10% auto; /* Adjust margin for smaller screens */
   }
+}
+
+/* Modal Form Styling */
+
+/* Aligning Form Groups */
+.modal-body .form-group {
+  margin-bottom: 1rem; /* Space between form groups */
+}
+
+/* Styling Labels */
+.modal-body .form-label {
+  display: block; /* Ensure labels are block level */
+  margin-bottom: 0.5rem;
+  font-size: 16px; /* Slightly larger font size for readability */
+  font-weight: 600; /* Making the label text bolder */
+  color: #333; /* Dark color for better contrast */
+}
+
+/* Styling Input, Select, Textarea fields */
+.modal-body .form-control {
+  width: 100%; /* Full width */
+  padding: 10px 15px; /* Ample padding for ease of use */
+  font-size: 16px; /* Larger font size for readability */
+  border-radius: 5px; /* Rounded corners */
+  border: 1px solid #ced4da; /* Subtle border color */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* Slight inner shadow for depth */
+}
+
+/* Focused Field Styling */
+.modal-body .form-control:focus {
+  border-color: #80bdff; /* Highlight color when focused */
+  outline: 0; /* Removing default focus outline */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Adding a soft glow on focus */
+}
+
+/* Styling Text areas specifically */
+.modal-body .form-control[type="textarea"] {
+  height: auto; /* Auto height based on content */
+  min-height: 100px; /* Minimum height */
+}
+
+/* Button Styling */
+.modal-footer .btn {
+  padding: 10px 20px; /* More padding for a larger button */
+  font-size: 16px; /* Font size consistent with inputs */
+  border-radius: 5px; /* Rounded corners for buttons */
+}
+
+/* Save Button Specific Style */
+.modal-footer .btn-primary {
+  background-color: #007bff; /* Primary color */
+  border-color: #007bff; /* Border color same as background */
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #0069d9; /* Darker shade on hover */
+  border-color: #0062cc; /* Border color change on hover */
+}
+
+/* Close Button Style */
+.modal-footer .btn-secondary {
+  background-color: #6c757d; /* Secondary color */
+  border-color: #6c757d;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #5a6268; /* Darker shade on hover */
+  border-color: #545b62;
 }
