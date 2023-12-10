@@ -9,6 +9,12 @@ import TeacherDashboard from "./components/dashboard/TeacherDashboard";
 import AdminDashboard from "./components/dashboard/AdminDashboard";
 import "./App.css";
 
+/**
+ * The main component of the application.
+ * Renders the header, routes, and footer components.
+ *
+ * @returns {JSX.Element} The rendered App component.
+ */
 function App() {
   return (
     <Router>

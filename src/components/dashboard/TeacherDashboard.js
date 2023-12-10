@@ -18,6 +18,10 @@ const DATE_FILTERS = {
   MONTH: "Month",
 };
 
+/**
+ * TeacherDashboard component represents the dashboard for a teacher.
+ * It displays student information, assignments, and allows editing assignments.
+ */
 const TeacherDashboard = () => {
   const [assignments, setAssignments] = useState([]);
   const [fromDate, setFromDate] = useState(null);
@@ -82,7 +86,7 @@ const TeacherDashboard = () => {
       const dd = String(date.getDate()).padStart(2, "0");
       return `${yyyy}-${mm}-${dd}`;
     } else {
-      return ""; // or any default value you prefer
+      return "";
     }
   };
 
