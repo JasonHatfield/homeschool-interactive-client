@@ -1,21 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
-import { Table, Button, ButtonGroup, Form, Container } from "react-bootstrap";
-import DatePicker from "../custom/CustomDatePicker";
+import { Table, Form, Container } from "react-bootstrap";
 import apiClient from "../../services/apiClient";
 
-const DATE_FILTERS = {
-  TODAY: "Today",
-  THIS_WEEK: "ThisWeek",
-  MONTH: "Month",
-};
+// Utility function for date formatting
+const formatDate = (date) => date.toISOString().split("T")[0];
 
 const StudentDashboard = () => {
   const [assignments, setAssignments] = useState([]);
-  const [selectedDateRange, setSelectedDateRange] = useState([
-    new Date(),
-    new Date(),
-  ]);
   const [studentName, setStudentName] = useState("");
   const [gradeLevel, setGradeLevel] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -27,47 +18,32 @@ const StudentDashboard = () => {
       setStudentName(`${firstName} ${lastName}`);
       setGradeLevel(gradeLevel);
     } catch (error) {
-      console.error("Error fetching student data:", error);
+      console.error("Failed to fetch student data:", error);
     }
   }, []);
 
-  const fetchAssignmentsByDateRange = useCallback(async (start, end) => {
+  const fetchAssignments = useCallback(async () => {
     try {
-      const formattedStart = formatDate(start);
-      const adjustedEnd = new Date(end);
-      adjustedEnd.setHours(23, 59, 59, 999);
-
-      const assignmentsResponse = await apiClient.get("/assignments/range", {
-        params: { startDate: formattedStart, endDate: formatDate(adjustedEnd) },
-      });
+      const assignmentsResponse = await apiClient.get("/assignments");
       setAssignments(assignmentsResponse.data);
     } catch (error) {
-      console.error("Error fetching assignments:", error);
+      console.error("Failed to fetch assignments:", error);
     }
   }, []);
 
   useEffect(() => {
     fetchStudentData();
-    fetchAssignmentsByDateRange(selectedDateRange[0], selectedDateRange[1]);
+    fetchAssignments();
 
-    const updateTime = () => {
-      setCurrentTime(new Date());
-    };
-
+    const updateTime = () => setCurrentTime(new Date());
     const intervalId = setInterval(updateTime, 1000);
 
     return () => clearInterval(intervalId);
-  }, [fetchStudentData, fetchAssignmentsByDateRange, selectedDateRange]);
-
-  const formatDate = (date) => date.toISOString().split("T")[0];
-
-  const handleDateRangeChange = (start, end) => {
-    setSelectedDateRange([start, end]);
-  };
+  }, [fetchStudentData, fetchAssignments]);
 
   const handleToggleAssignmentStatus = async (assignmentId, currentStatus) => {
     if (!assignmentId) {
-      console.error("Assignment ID is undefined");
+      console.error("Undefined assignment ID");
       return;
     }
 
@@ -75,16 +51,23 @@ const StudentDashboard = () => {
     try {
       const response = await apiClient.put(
         `/assignments/${assignmentId}/status`,
+        null,
         {
-          status: newStatus,
+          params: { status: newStatus },
         }
       );
 
       if (response.status === 200) {
-        updateAssignmentStatus(assignmentId, newStatus);
+        setAssignments((prevAssignments) =>
+          prevAssignments.map((assignment) =>
+            assignment.assignmentId === assignmentId
+              ? { ...assignment, status: newStatus }
+              : assignment
+          )
+        );
       } else {
         console.error(
-          "Error updating assignment status. Status code:",
+          "Failed to update assignment status. Status code:",
           response.status
         );
       }
@@ -93,35 +76,31 @@ const StudentDashboard = () => {
     }
   };
 
-  const updateAssignmentStatus = (assignmentId, newStatus) => {
-    setAssignments((prevAssignments) =>
-      prevAssignments.map((assignment) =>
-        assignment.assignmentId === assignmentId
-          ? { ...assignment, status: newStatus }
-          : assignment
-      )
+  useEffect(() => {
+    const sortedAssignments = [...assignments].sort(
+      (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
     );
-  };
 
-  const handleDateFilterButtonClick = (filterType) => {
-    let start, end;
-    switch (filterType) {
-      case DATE_FILTERS.TODAY:
-        start = end = new Date();
-        break;
-      case DATE_FILTERS.THIS_WEEK:
-        start = startOfWeek(new Date());
-        end = endOfWeek(new Date());
-        break;
-      case DATE_FILTERS.MONTH:
-        start = startOfMonth(new Date());
-        end = endOfMonth(new Date());
-        break;
-      default:
-        start = end = new Date();
+    // Check if sortedAssignments is different from current assignments
+    if (!areArraysEqual(sortedAssignments, assignments)) {
+      setAssignments(sortedAssignments);
     }
-    handleDateRangeChange(start, end);
-  };
+  }, [assignments]);
+
+  // Utility function to compare arrays
+  function areArraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   return (
     <Container>
@@ -131,25 +110,6 @@ const StudentDashboard = () => {
         <h3>Grade: {gradeLevel}</h3>
         <p>Current Time: {currentTime.toLocaleTimeString()}</p>
       </div>
-
-      <ButtonGroup>
-        <Button onClick={() => handleDateFilterButtonClick(DATE_FILTERS.TODAY)}>
-          Today
-        </Button>
-        <Button
-          onClick={() => handleDateFilterButtonClick(DATE_FILTERS.THIS_WEEK)}
-        >
-          This Week
-        </Button>
-        <Button onClick={() => handleDateFilterButtonClick(DATE_FILTERS.MONTH)}>
-          Month
-        </Button>
-      </ButtonGroup>
-
-      <DatePicker
-        selectedDateRange={selectedDateRange}
-        handleDateRangeChange={handleDateRangeChange}
-      />
 
       <Table>
         <thead>
@@ -161,58 +121,32 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {assignments.map((assignment) => {
-            const currentDate = new Date();
-            const startOfToday = new Date(
-              currentDate.getFullYear(),
-              currentDate.getMonth(),
-              currentDate.getDate()
-            );
-            const assignmentDueDate = new Date(assignment.dueDate);
-
-            const isDueToday =
-              assignmentDueDate >= startOfToday &&
-              assignmentDueDate <= currentDate;
-            const isNotComplete = assignment.status !== "Complete";
-
-            if (
-              isDueToday ||
-              (assignmentDueDate < startOfToday && isNotComplete)
-            ) {
-              return (
-                <tr
-                  key={assignment.assignmentId}
-                  className={`${
+          {assignments.map((assignment) => (
+            <tr
+              key={assignment.assignmentId}
+              className={assignment.status === "Accepted" ? "greyed-out" : ""}
+            >
+              <td>
+                <Form.Check
+                  type="checkbox"
+                  checked={
+                    assignment.status === "Review" ||
                     assignment.status === "Accepted"
-                      ? "accepted-assignment"
-                      : ""
-                  } ${isDueToday ? "due-today-assignment" : ""}`}
-                >
-                  <td>
-                    <Form.Check
-                      type="checkbox"
-                      checked={
-                        assignment.status === "Review" ||
-                        assignment.status === "Accepted"
-                      }
-                      onChange={() =>
-                        handleToggleAssignmentStatus(
-                          assignment.assignmentId,
-                          assignment.status
-                        )
-                      }
-                      disabled={assignment.status === "Accepted"}
-                    />
-                  </td>
-                  <td>{formatDate(new Date(assignment.dueDate))}</td>
-                  <td>{assignment.subject.name}</td>
-                  <td>{assignment.description}</td>
-                </tr>
-              );
-            } else {
-              return null; // Hide assignments that are not due today and are complete
-            }
-          })}
+                  }
+                  onChange={() =>
+                    handleToggleAssignmentStatus(
+                      assignment.assignmentId,
+                      assignment.status
+                    )
+                  }
+                  disabled={assignment.status === "Accepted"}
+                />
+              </td>
+              <td>{formatDate(new Date(assignment.dueDate))}</td>
+              <td>{assignment.subject.name}</td>
+              <td>{assignment.description}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </Container>

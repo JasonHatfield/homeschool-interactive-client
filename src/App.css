@@ -328,124 +328,128 @@ body {
   width: 40%; /* Adjust as needed */
 }
 
-/* The Modal (background) */
+/* Modal */
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  display: none;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.6
-  ); /* Black with more opacity for darker overlay */
+  width: 100%;
+  height: 100%; /* Set to 100% of the viewport height */
+  background-color: rgba(0, 0, 0, 0.6);
+  overflow: auto;
 }
 
-/* Modal Content/Box */
+/* Modal Content */
 .modal-content {
-  position: relative;
   background-color: #ffffff;
-  margin: 5% auto; /* Reduced top margin and centered */
-  padding: 40px; /* Increased padding for more space */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-  width: 50%; /* Adjusted width for medium size */
-  max-width: 600px; /* Maximum width */
-  }
+  margin: auto;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 350px;
+  text-align: center;
+  max-height: 80vh; /* Set to 90% of the viewport height */
+  overflow-y: auto; /* Add vertical scrollbar if content exceeds 90% of the viewport height */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
-/* The Close Button */
+/* Close Button */
 .close {
   color: #707070;
   position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 30px; /* Increased size */
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
   font-weight: bold;
 }
 
 .close:hover,
 .close:focus {
-  color: #ff4444; /* Change color on hover/focus for better visibility */
+  color: #ff4444;
   text-decoration: none;
   cursor: pointer;
 }
 
-@media (max-width: 600px) {
-  .modal-content {
-    width: 90%; /* Full width on smaller screens */
-    margin: 10% auto; /* Adjust margin for smaller screens */
-  }
-}
-
-/* Modal Form Styling */
-
-/* Aligning Form Groups */
+/* Form Group */
 .modal-body .form-group {
-  margin-bottom: 1rem; /* Space between form groups */
+  margin-bottom: 10px;
 }
 
-/* Styling Labels */
+/* Labels */
 .modal-body .form-label {
-  display: block; /* Ensure labels are block level */
-  margin-bottom: 0.5rem;
-  font-size: 16px; /* Slightly larger font size for readability */
-  font-weight: 600; /* Making the label text bolder */
-  color: #333; /* Dark color for better contrast */
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+  vertical-align: middle; /* Center the labels vertically */
 }
 
-/* Styling Input, Select, Textarea fields */
+.greyed-out {
+  background-color: #cccccc; /* Grey color */
+}
+
+/* Form Controls */
 .modal-body .form-control {
-  width: 100%; /* Full width */
-  padding: 10px 15px; /* Ample padding for ease of use */
-  font-size: 16px; /* Larger font size for readability */
-  border-radius: 5px; /* Rounded corners */
-  border: 1px solid #ced4da; /* Subtle border color */
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* Slight inner shadow for depth */
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Focused Field Styling */
+/* Center text within form fields */
+.modal-body .form-control input[type="text"],
+.modal-body .form-control textarea {
+  text-align: center; /* Center text within the form fields */
+}
+
+/* Focused Field */
 .modal-body .form-control:focus {
-  border-color: #80bdff; /* Highlight color when focused */
-  outline: 0; /* Removing default focus outline */
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Adding a soft glow on focus */
+  border-color: #007bff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Styling Text areas specifically */
+/* Textarea */
 .modal-body .form-control[type="textarea"] {
-  height: auto; /* Auto height based on content */
-  min-height: 100px; /* Minimum height */
+  min-height: 150px;
 }
 
-/* Button Styling */
+/* Buttons */
 .modal-footer .btn {
-  padding: 10px 20px; /* More padding for a larger button */
-  font-size: 16px; /* Font size consistent with inputs */
-  border-radius: 5px; /* Rounded corners for buttons */
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 5px;
 }
 
-/* Save Button Specific Style */
+/* Save Button */
 .modal-footer .btn-primary {
-  background-color: #007bff; /* Primary color */
-  border-color: #007bff; /* Border color same as background */
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
 }
 
 .modal-footer .btn-primary:hover {
-  background-color: #0069d9; /* Darker shade on hover */
-  border-color: #0062cc; /* Border color change on hover */
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
-/* Close Button Style */
+/* Close Button */
 .modal-footer .btn-secondary {
-  background-color: #6c757d; /* Secondary color */
+  background-color: #6c757d;
   border-color: #6c757d;
+  color: #fff;
 }
 
 .modal-footer .btn-secondary:hover {
-  background-color: #5a6268; /* Darker shade on hover */
+  background-color: #545b62;
   border-color: #545b62;
 }

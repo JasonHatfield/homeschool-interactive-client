@@ -66,23 +66,6 @@ const TeacherDashboard = () => {
     }
   }, []);
 
-  const fetchAssignmentsByDateRange = useCallback(async () => {
-    try {
-      const start = fromDate instanceof Date ? fromDate : new Date(0);
-      const end = toDate instanceof Date ? toDate : new Date();
-      const response = await apiClient.get("/assignments/range", {
-        params: { startDate: start.toISOString(), endDate: end.toISOString() },
-      });
-
-      const filteredAssignments = response.data
-        .filter((assignment) => assignment.status !== "Accepted")
-        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-      setAssignments(filteredAssignments);
-    } catch (error) {
-      console.error("Error fetching assignments:", error);
-    }
-  }, [fromDate, toDate]);
-
   const formatDate = (date) => {
     if (date instanceof Date && !isNaN(date)) {
       // Format the date directly without adjusting for the timezone
@@ -120,7 +103,7 @@ const TeacherDashboard = () => {
     setEditableAssignment({
       ...assignment,
       dueDate: dueDate.toISOString(),
-      // Ensure other necessary fields are included
+      subjectId: assignment.subjectId, // Ensure the correct subject ID is set
     });
     setShowModal(true);
   };
@@ -129,30 +112,47 @@ const TeacherDashboard = () => {
     setShowModal(false);
   };
 
-  const saveAssignment = () => {
-    // Add logic to save the edited assignment
-    closeModal();
+  const saveAssignment = async () => {
+    try {
+      // Update the assignment data in the backend
+      await apiClient.put(
+        `/assignments/${editableAssignment.assignmentId}`,
+        editableAssignment
+      );
+
+      // Update the assignment in the state with the edited data
+      setAssignments((prevAssignments) =>
+        prevAssignments.map((assignment) =>
+          assignment.assignmentId === editableAssignment.assignmentId
+            ? editableAssignment
+            : assignment
+        )
+      );
+
+      // Close the modal
+      closeModal();
+    } catch (error) {
+      console.error("Error saving assignment:", error);
+    }
   };
 
-  // For fetching student data and subjects
   useEffect(() => {
-    // Set fromDate to a distant past date and toDate to the end of today
+    // Set initial fromDate and toDate
     const today = new Date();
-    today.setHours(23, 59, 59, 999); // Set to end of today
-
-    setFromDate(new Date(0)); // Set fromDate to the beginning of Unix time
-    setToDate(today); // Set toDate to the end of today
+    today.setHours(23, 59, 59, 999);
+    setFromDate(new Date(0));
+    setToDate(today);
 
     fetchStudentData();
     fetchSubjects();
-  }, [fetchStudentData, fetchSubjects]); // Dependencies
+  }, [fetchStudentData, fetchSubjects]);
 
-  // This useEffect will run when fromDate or toDate changes
   useEffect(() => {
+    // Refactored useEffect for fetching assignments
     const fetchAssignments = async () => {
+      const start = fromDate instanceof Date ? fromDate : new Date(0);
+      const end = toDate instanceof Date ? toDate : new Date();
       try {
-        const start = fromDate instanceof Date ? fromDate : new Date(0);
-        const end = toDate instanceof Date ? toDate : new Date();
         const response = await apiClient.get("/assignments/range", {
           params: {
             startDate: start.toISOString(),
@@ -160,17 +160,21 @@ const TeacherDashboard = () => {
           },
         });
 
-        const filteredAssignments = response.data
-          .filter((assignment) => assignment.status !== "Accepted")
-          .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-        setAssignments(filteredAssignments);
+        // Parse due dates as Date objects and sort assignments
+        const sortedAssignments = response.data
+          .map((assignment) => ({
+            ...assignment,
+            dueDate: new Date(assignment.dueDate), // Parse due date as Date object
+          }))
+          .sort((a, b) => a.dueDate - b.dueDate); // Sort by due date
+
+        setAssignments(sortedAssignments);
       } catch (error) {
         console.error("Error fetching assignments:", error);
       }
     };
-
     fetchAssignments();
-  }, [fromDate, toDate]); // Dependencies
+  }, [fromDate, toDate]);
 
   const handleDateFilterButtonClick = (filterType) => {
     let start = new Date();
@@ -220,19 +224,22 @@ const TeacherDashboard = () => {
             onBlur={handleBlur}
           />
           <Form.Label>Grade Level</Form.Label>
-          <Form.Control
-            as="select"
-            name="gradeLevel"
-            value={student.gradeLevel}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-          >
-            {[...Array(12).keys()].map((grade) => (
-              <option key={grade + 1} value={grade + 1}>
-                {grade + 1}
-              </option>
-            ))}
-          </Form.Control>
+          <Form.Group>
+            <Form.Label>Grade Level</Form.Label>
+            <Form.Control
+              as="select"
+              name="gradeLevel"
+              value={student.gradeLevel}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+            >
+              {[...Array(12).keys()].map((grade) => (
+                <option key={grade + 1} value={grade + 1}>
+                  {grade + 1}
+                </option>
+              ))}
+            </Form.Control>
+          </Form.Group>
         </Form.Group>
       </Form>
 
@@ -318,11 +325,8 @@ const TeacherDashboard = () => {
                   })
                 }
               >
-                {subjects.map((subject, index) => (
-                  <option
-                    key={subject.id ? subject.id.toString() : index}
-                    value={subject.id}
-                  >
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
                     {subject.name}
                   </option>
                 ))}
@@ -350,11 +354,11 @@ const TeacherDashboard = () => {
               <Form.Label>Status</Form.Label>
               <Form.Control
                 as="select"
-                value={editableAssignment.status || ""}
+                value={editableAssignment.subjectId || ""}
                 onChange={(e) =>
                   setEditableAssignment({
                     ...editableAssignment,
-                    status: e.target.value,
+                    subjectId: e.target.value,
                   })
                 }
               >
