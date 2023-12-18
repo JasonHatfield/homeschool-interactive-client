@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import Login from "./components/auth/Login";
-// import Register from "./components/auth/Register";
+import Register from "./components/auth/Register";
 import StudentDashboard from "./components/dashboard/StudentDashboard";
 import TeacherDashboard from "./components/dashboard/TeacherDashboard";
 import AdminDashboard from "./components/dashboard/AdminDashboard";
@@ -22,7 +22,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Login />} />
-          {/* <Route path="/register" element={<Register />} /> */}
+          <Route path="/register" element={<Register />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/teacher" element={<TeacherDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
