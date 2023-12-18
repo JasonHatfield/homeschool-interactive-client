@@ -1,44 +1,38 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState } from "react";
+import apiClient from '../services/apiClient';
 
-// Create an authentication context
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
-/**
- * Provides authentication context to child components.
- * @param {Object} props - The component props.
- * @param {ReactNode} props.children - The child components.
- * @returns {ReactNode} - The wrapped child components with authentication context.
- */
 export const AuthProvider = ({ children }) => {
-    // Use 'auth' as the initial state to represent user authentication
+    // Removed 'setAuthState' as it's not used currently
     const [authState] = useState(null);
 
-    /**
-     * Handles the login functionality.
-     * @param {Object} credentials - The user credentials.
-     */
-    const login = (credentials) => {
-        // Implement login logic here, e.g., by setting 'authState' based on credentials
+    const login = async (/* credentials */) => {
+        // Placeholder for future implementation
+        // throw new Error("Login functionality not implemented yet.");
     };
 
-    /**
-     * Handles the logout functionality.
-     */
     const logout = () => {
-        // Implement logout logic here, e.g., by clearing 'authState'
+        // Implement logout logic here
     };
 
-    // Provide the authentication state and functions to children components
+    const register = async (userInfo) => {
+        try {
+            // 'response' variable removed as it was not used
+            await apiClient.post('/users/register', userInfo);
+            // Handle the successful registration
+        } catch (error) {
+            if (error.response && error.response.data) {
+                throw new Error(error.response.data);
+            } else {
+                throw new Error("An unexpected error occurred during registration.");
+            }
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ authState, login, logout }}>
+        <AuthContext.Provider value={{ authState, login, logout, register }}>
             {children}
         </AuthContext.Provider>
     );
 };
-
-// Create a custom hook for accessing the authentication context
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-export default AuthContext;

@@ -521,3 +521,32 @@ body {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
+
+/* Apply form control styles to select element */
+.login-form select.form-control {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Style the select element on focus */
+.login-form select.form-control:focus {
+  border-color: #007bff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.warning {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.success {
+  color: green;
+  font-size: 14px;
+  margin-top: 5px;
+}
