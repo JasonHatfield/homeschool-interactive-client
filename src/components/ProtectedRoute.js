@@ -1,14 +1,16 @@
-// src/components/ProtectedRoute.js
 import React, { useContext } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import {AuthContext} from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Update the import path as necessary
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredRole }) => {
     const { authState } = useContext(AuthContext);
-    const location = useLocation();
 
-    if (!authState.isLoggedIn) {
-        return <Navigate to="/" state={{ from: location }} replace />;
+    if (!authState.isAuthenticated) {
+        return <Navigate to="/" />;
+    }
+
+    if (requiredRole && authState.role !== requiredRole) {
+        return <Navigate to="/unauthorized" />; // Redirect or handle unauthorized access
     }
 
     return children;

@@ -4,23 +4,31 @@ import apiClient from '../services/apiClient';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    // Removed 'setAuthState' as it's not used currently
-    const [authState] = useState(null);
+    const [authState, setAuthState] = useState({ isAuthenticated: false, role: null });
 
-    const login = async (/* credentials */) => {
-        // Placeholder for future implementation
-        // throw new Error("Login functionality not implemented yet.");
+    const login = async (credentials) => {
+        try {
+            // Here we'll make an API call to the login endpoint
+            // This is a basic example and should be adjusted based on your backend
+            const response = await apiClient.post('/login', credentials);
+
+            // Assuming the response includes the user's role
+            const { role } = response.data;
+            setAuthState({ isAuthenticated: true, role }); // Update authState
+        } catch (error) {
+            console.error("Login error:", error);
+            // Handle errors, such as displaying a login failure message
+        }
     };
 
     const logout = () => {
-        // Implement logout logic here
+        setAuthState({ isAuthenticated: false, role: null });
     };
 
     const register = async (userInfo) => {
         try {
-            // 'response' variable removed as it was not used
             await apiClient.post('/users/register', userInfo);
-            // Handle the successful registration
+            // Handle successful registration, such as logging in the user
         } catch (error) {
             if (error.response && error.response.data) {
                 throw new Error(error.response.data);
