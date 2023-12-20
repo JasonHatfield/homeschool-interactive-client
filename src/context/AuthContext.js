@@ -1,12 +1,11 @@
 import React, { createContext, useState, useEffect } from "react";
-import apiClient from '../services/apiClient';
+import apiClient, { setAuthToken } from '../services/apiClient';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    // Initialize state from localStorage to persist login state
     const initialState = {
-        isLoggedIn: localStorage.getItem('token') ? true : false,
+        isLoggedIn: !!localStorage.getItem('token'),
         role: localStorage.getItem('role') || null,
         token: localStorage.getItem('token') || null,
         loginError: null
@@ -14,7 +13,6 @@ export const AuthProvider = ({ children }) => {
 
     const [authState, setAuthState] = useState(initialState);
 
-    // Login function
     const login = async (credentials) => {
         try {
             const response = await apiClient.post('/api/auth/login', credentials);
@@ -22,36 +20,32 @@ export const AuthProvider = ({ children }) => {
 
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
+            setAuthToken(token);
             setAuthState({ isLoggedIn: true, role, token });
         } catch (error) {
-            const errorMessage = error.response?.data || error.message;
+            const errorMessage = error.response?.data.message || error.message; // Adjusted for more specific error handling
             setAuthState(prevState => ({ ...prevState, loginError: errorMessage }));
         }
     };
 
-    // Logout function
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
+        setAuthToken(null);
         setAuthState({ isLoggedIn: false, role: null, token: null, loginError: null });
     };
 
-    // Register function (assuming it's similar to login)
-    const register = async (userInfo) => {
-        // Implement registration logic
-    };
-
-    // Effect to handle token changes
     useEffect(() => {
         const token = localStorage.getItem('token');
         const role = localStorage.getItem('role');
         if (token) {
+            setAuthToken(token);
             setAuthState({ isLoggedIn: true, role, token });
         }
     }, []);
 
     return (
-        <AuthContext.Provider value={{ authState, login, logout, register }}>
+        <AuthContext.Provider value={{ authState, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

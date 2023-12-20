@@ -1,26 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Table, Form, Container } from "react-bootstrap";
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import { Table, Form, Container, Button } from "react-bootstrap";
 import apiClient from "../../services/apiClient";
+import { AuthContext } from "../../context/AuthContext";
 
-// Utility function for date formatting
 const formatDate = (date) => date.toISOString().split("T")[0];
 
-/**
- * Represents the student dashboard component.
- * This component displays the student's information, current time, and a list of assignments.
- * It also allows the student to toggle the status of each assignment.
- */
 const StudentDashboard = () => {
-    // State variables
     const [assignments, setAssignments] = useState([]);
     const [studentName, setStudentName] = useState("");
     const [gradeLevel, setGradeLevel] = useState(null);
     const [currentTime, setCurrentTime] = useState(new Date());
+    const { logout } = useContext(AuthContext);
 
-    /**
-     * Fetches the student's data from the server.
-     * Updates the student's name and grade level in the state.
-     */
+    const handleLogout = () => {
+        logout();
+    };
+
     const fetchStudentData = useCallback(async () => {
         try {
             const studentResponse = await apiClient.get("/students/1");
@@ -32,10 +27,6 @@ const StudentDashboard = () => {
         }
     }, []);
 
-    /**
-     * Fetches the assignments from the server.
-     * Updates the assignments in the state.
-     */
     const fetchAssignments = useCallback(async () => {
         try {
             const assignmentsResponse = await apiClient.get("/assignments");
@@ -45,10 +36,6 @@ const StudentDashboard = () => {
         }
     }, []);
 
-    /**
-     * Updates the current time every second.
-     * Clears the interval when the component is unmounted.
-     */
     useEffect(() => {
         fetchStudentData();
         fetchAssignments();
@@ -59,12 +46,6 @@ const StudentDashboard = () => {
         return () => clearInterval(intervalId);
     }, [fetchStudentData, fetchAssignments]);
 
-    /**
-     * Handles the toggling of an assignment's status.
-     * Updates the assignment's status in the state and sends a request to the server to update the status.
-     * @param {number} assignmentId - The ID of the assignment.
-     * @param {string} currentStatus - The current status of the assignment.
-     */
     const handleToggleAssignmentStatus = async (assignmentId, currentStatus) => {
         if (!assignmentId) {
             console.error("Undefined assignment ID");
@@ -73,71 +54,32 @@ const StudentDashboard = () => {
 
         const newStatus = currentStatus === "Review" ? "Incomplete" : "Review";
         try {
-            const response = await apiClient.put(
-                `/assignments/${assignmentId}/status`,
-                null,
-                {
-                    params: { status: newStatus },
-                }
+            await apiClient.put(`/assignments/${assignmentId}/status`, { status: newStatus });
+            setAssignments(prevAssignments =>
+                prevAssignments.map(assignment =>
+                    assignment.assignmentId === assignmentId
+                        ? { ...assignment, status: newStatus }
+                        : assignment
+                )
             );
-
-            if (response.status === 200) {
-                setAssignments((prevAssignments) =>
-                    prevAssignments.map((assignment) =>
-                        assignment.assignmentId === assignmentId
-                            ? { ...assignment, status: newStatus }
-                            : assignment
-                    )
-                );
-            } else {
-                console.error(
-                    "Failed to update assignment status. Status code:",
-                    response.status
-                );
-            }
         } catch (error) {
             console.error("Error updating assignment status:", error);
         }
     };
 
-    /**
-     * Sorts the assignments by due date in ascending order.
-     * Updates the assignments in the state if they are different from the sorted assignments.
-     */
     useEffect(() => {
         const sortedAssignments = [...assignments].sort(
             (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
         );
 
-        // Check if sortedAssignments is different from current assignments
-        if (!areArraysEqual(sortedAssignments, assignments)) {
+        if (JSON.stringify(sortedAssignments) !== JSON.stringify(assignments)) {
             setAssignments(sortedAssignments);
         }
     }, [assignments]);
 
-    /**
-     * Utility function to compare two arrays for equality.
-     * @param {Array} arr1 - The first array.
-     * @param {Array} arr2 - The second array.
-     * @returns {boolean} - True if the arrays are equal, false otherwise.
-     */
-    function areArraysEqual(arr1, arr2) {
-        if (arr1.length !== arr2.length) {
-            return false;
-        }
-
-        for (let i = 0; i < arr1.length; i++) {
-            if (arr1[i] !== arr2[i]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    // JSX markup
     return (
         <Container>
+            <Button variant="danger" onClick={handleLogout}>Logout</Button>
             <div className="student-info text-center">
                 <h1>Hatfield Home School</h1>
                 <h2>{studentName}</h2>
@@ -156,23 +98,12 @@ const StudentDashboard = () => {
                 </thead>
                 <tbody>
                     {assignments.map((assignment) => (
-                        <tr
-                            key={assignment.assignmentId}
-                            className={assignment.status === "Accepted" ? "greyed-out" : ""}
-                        >
+                        <tr key={assignment.assignmentId} className={assignment.status === "Accepted" ? "greyed-out" : ""}>
                             <td>
                                 <Form.Check
                                     type="checkbox"
-                                    checked={
-                                        assignment.status === "Review" ||
-                                        assignment.status === "Accepted"
-                                    }
-                                    onChange={() =>
-                                        handleToggleAssignmentStatus(
-                                            assignment.assignmentId,
-                                            assignment.status
-                                        )
-                                    }
+                                    checked={assignment.status === "Review" || assignment.status === "Accepted"}
+                                    onChange={() => handleToggleAssignmentStatus(assignment.assignmentId, assignment.status)}
                                     disabled={assignment.status === "Accepted"}
                                 />
                             </td>
