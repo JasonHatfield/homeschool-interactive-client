@@ -44,7 +44,7 @@ const TeacherDashboard = () => {
         }
     }, []);
 
-    const fetchAssignments = async () => {
+    const fetchAssignments = useCallback(async () => {
         try {
             const response = await apiClient.get("/assignments/range", {
                 params: {
@@ -59,7 +59,7 @@ const TeacherDashboard = () => {
         } catch (error) {
             console.error("Error fetching assignments:", error);
         }
-    };
+    }, [fromDate, toDate]);
 
     useEffect(() => {
         fetchStudentData();
@@ -68,7 +68,7 @@ const TeacherDashboard = () => {
 
     useEffect(() => {
         fetchAssignments();
-    }, [fromDate, toDate]);
+    }, [fetchAssignments]);
 
     const handleInputChange = (e) => {
         setStudent({ ...student, [e.target.name]: e.target.value });

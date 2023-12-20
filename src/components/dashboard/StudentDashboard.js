@@ -10,7 +10,8 @@ const StudentDashboard = () => {
     const [studentName, setStudentName] = useState("");
     const [gradeLevel, setGradeLevel] = useState(null);
     const [currentTime, setCurrentTime] = useState(new Date());
-    const { logout } = useContext(AuthContext);
+    const { authState, logout } = useContext(AuthContext);
+    const userId = authState.userId;
 
     const handleLogout = () => {
         logout();
@@ -18,14 +19,14 @@ const StudentDashboard = () => {
 
     const fetchStudentData = useCallback(async () => {
         try {
-            const studentResponse = await apiClient.get("/students/1");
+            const studentResponse = await apiClient.get(`/students/${userId}`);
             const { firstName, lastName, gradeLevel } = studentResponse.data;
             setStudentName(`${firstName} ${lastName}`);
             setGradeLevel(gradeLevel);
         } catch (error) {
             console.error("Failed to fetch student data:", error);
         }
-    }, []);
+    }, [userId]);
 
     const fetchAssignments = useCallback(async () => {
         try {

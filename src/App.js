@@ -12,7 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext";
 
 function App() {
-  const { authState } = useContext(AuthContext);
+useContext(AuthContext);
 
   return (
       <Router>

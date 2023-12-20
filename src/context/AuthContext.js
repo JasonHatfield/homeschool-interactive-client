@@ -5,9 +5,10 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const initialState = {
-        isLoggedIn: !!localStorage.getItem('token'),
-        role: localStorage.getItem('role') || null,
-        token: localStorage.getItem('token') || null,
+        isLoggedIn: false,
+        role: null,
+        token: null,
+        userId: null,
         loginError: null
     };
 
@@ -16,14 +17,15 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await apiClient.post('/api/auth/login', credentials);
-            const { token, role } = response.data;
+            const { token, role, userId } = response.data;
 
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
+            localStorage.setItem('userId', userId.toString());
             setAuthToken(token);
-            setAuthState({ isLoggedIn: true, role, token });
+            setAuthState({ isLoggedIn: true, role, token, userId });
         } catch (error) {
-            const errorMessage = error.response?.data.message || error.message; // Adjusted for more specific error handling
+            const errorMessage = error.response?.data?.message || error.message;
             setAuthState(prevState => ({ ...prevState, loginError: errorMessage }));
         }
     };
@@ -31,16 +33,18 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
+        localStorage.removeItem('userId');
         setAuthToken(null);
-        setAuthState({ isLoggedIn: false, role: null, token: null, loginError: null });
+        setAuthState({ isLoggedIn: false, role: null, token: null, userId: null, loginError: null });
     };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const role = localStorage.getItem('role');
-        if (token) {
+        const userId = localStorage.getItem('userId');
+        if (token && userId) {
             setAuthToken(token);
-            setAuthState({ isLoggedIn: true, role, token });
+            setAuthState({ isLoggedIn: true, role, token, userId: parseInt(userId, 10) });
         }
     }, []);
 
