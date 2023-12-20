@@ -5,7 +5,6 @@ import apiClient from "../../services/apiClient.js";
 
 /**
  * AdminDashboard component represents the dashboard for the admin user.
- * It allows the admin to manage subjects for the homeschool.
  */
 const AdminDashboard = () => {
     // State to store subjects

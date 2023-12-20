@@ -1,29 +1,34 @@
 import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { Navigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const useRedirectAfterLogin = () => {
+    const { authState } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const redirectPath = authState.role === 'ROLE_TEACHER' ? '/teacher' : '/student';
+
+        if (authState.isLoggedIn && location.pathname !== redirectPath) {
+            navigate(redirectPath, { replace: true });
+        } else if (authState.loginError) {
+            alert(authState.loginError);
+        }
+    }, [authState, navigate, location.pathname]);
+};
 
 const Login = () => {
     const [credentials, setCredentials] = useState({ username: "", password: "" });
-    const { authState, login } = useContext(AuthContext);
-    const [redirectTo, setRedirectTo] = useState(null);
+    const { login } = useContext(AuthContext);
 
-    // Effect for handling redirection
-    useEffect(() => {
-        if (authState.isLoggedIn && authState.role) {
-            const redirectPath = authState.role === 'ROLE_TEACHER' ? '/teacher' : '/student';
-            setRedirectTo(redirectPath);
-        }
-    }, [authState.isLoggedIn, authState.role]); // Only re-run if these specific properties change
-
-    // Effect for handling login error
-    useEffect(() => {
-        if (authState.loginError) {
-            alert(authState.loginError);
-        }
-    }, [authState.loginError]); // Only re-run if loginError changes
+    useRedirectAfterLogin();
 
     const handleChange = (e) => {
-        setCredentials({ ...credentials, [e.target.name]: e.target.value });
+        setCredentials(prevCredentials => ({
+            ...prevCredentials,
+            [e.target.name]: e.target.value
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -34,10 +39,6 @@ const Login = () => {
         }
         await login(credentials);
     };
-
-    if (redirectTo) {
-        return <Navigate to={redirectTo} replace />;
-    }
 
     return (
         <div className="login-container">

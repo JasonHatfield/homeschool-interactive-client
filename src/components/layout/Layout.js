@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "../common/Header";
+import Footer from "../common/Footer";
 
 /**
  * Renders the layout of the application.
