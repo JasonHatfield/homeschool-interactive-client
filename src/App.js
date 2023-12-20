@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
@@ -7,39 +7,38 @@ import Register from "./components/auth/Register";
 import StudentDashboard from "./components/dashboard/StudentDashboard";
 import TeacherDashboard from "./components/dashboard/TeacherDashboard";
 import AdminDashboard from "./components/dashboard/AdminDashboard";
-import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
 import "./App.css";
+import ProtectedRoute from "./components/ProtectedRoute";
+import {AuthContext} from "./context/AuthContext";
 
 /**
  * The main component of the application.
- * Renders the header, routes, and footer components with role-based route protection.
+ * Renders the header, routes, and footer components.
  *
  * @returns {JSX.Element} The rendered App component.
  */
 function App() {
+  const { authState } = useContext(AuthContext);
+
   return (
       <Router>
         <div className="App">
           <Header />
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/register" element={
-              <ProtectedRoute requiredRole="TEACHER">
-                <Register />
-              </ProtectedRoute>
-            } />
+            <Route path="/register" element={<Register />} />
             <Route path="/student" element={
-              <ProtectedRoute requiredRole="STUDENT">
+              <ProtectedRoute allowedRoles={['STUDENT']}>
                 <StudentDashboard />
               </ProtectedRoute>
             } />
             <Route path="/teacher" element={
-              <ProtectedRoute requiredRole="TEACHER">
+              <ProtectedRoute allowedRoles={['TEACHER']}>
                 <TeacherDashboard />
               </ProtectedRoute>
             } />
             <Route path="/admin" element={
-              <ProtectedRoute requiredRole="TEACHER">
+              <ProtectedRoute allowedRoles={['TEACHER']}>
                 <AdminDashboard />
               </ProtectedRoute>
             } />

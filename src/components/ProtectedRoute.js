@@ -1,16 +1,12 @@
 import React, { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // Update the import path as necessary
+import { Route, Navigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children, requiredRole }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
     const { authState } = useContext(AuthContext);
 
-    if (!authState.isAuthenticated) {
-        return <Navigate to="/" />;
-    }
-
-    if (requiredRole && authState.role !== requiredRole) {
-        return <Navigate to="/unauthorized" />; // Redirect or handle unauthorized access
+    if (!authState.isLoggedIn || !allowedRoles.includes(authState.role)) {
+        return <Navigate to="/" replace />;
     }
 
     return children;

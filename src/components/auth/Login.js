@@ -1,51 +1,43 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { Navigate } from 'react-router-dom';
 
 const Login = () => {
-    const [credentials, setCredentials] = useState({
-        username: "",
-        password: "",
-    });
+    const [credentials, setCredentials] = useState({ username: "", password: "" });
+    const { authState, login } = useContext(AuthContext);
+    const [redirectTo, setRedirectTo] = useState(null);
 
-    const { login } = useContext(AuthContext);
+    // Effect for handling redirection
+    useEffect(() => {
+        if (authState.isLoggedIn && authState.role) {
+            const redirectPath = authState.role === 'ROLE_TEACHER' ? '/teacher' : '/student';
+            setRedirectTo(redirectPath);
+        }
+    }, [authState.isLoggedIn, authState.role]); // Only re-run if these specific properties change
 
-    const [showUsernamePlaceholder, setShowUsernamePlaceholder] = useState(true);
-    const [showPasswordPlaceholder, setShowPasswordPlaceholder] = useState(true);
+    // Effect for handling login error
+    useEffect(() => {
+        if (authState.loginError) {
+            alert(authState.loginError);
+        }
+    }, [authState.loginError]); // Only re-run if loginError changes
 
     const handleChange = (e) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!credentials.username || !credentials.password) {
-            // Display an elegant and modern warning
             alert("Please enter both username and password.");
-        } else {
-            login(credentials);
+            return;
         }
+        await login(credentials);
     };
 
-    const handleUsernameInputFocus = () => {
-        setShowUsernamePlaceholder(false);
-    };
-
-    const handlePasswordInputFocus = () => {
-        setShowPasswordPlaceholder(false);
-    };
-
-    const handleUsernameInputBlur = () => {
-        if (credentials.username === "") {
-            setShowUsernamePlaceholder(true);
-        }
-    };
-
-    const handlePasswordInputBlur = () => {
-        if (credentials.password === "") {
-            setShowPasswordPlaceholder(true);
-        }
-    };
+    if (redirectTo) {
+        return <Navigate to={redirectTo} replace />;
+    }
 
     return (
         <div className="login-container">
@@ -56,9 +48,7 @@ const Login = () => {
                     name="username"
                     value={credentials.username}
                     onChange={handleChange}
-                    onFocus={handleUsernameInputFocus}
-                    onBlur={handleUsernameInputBlur}
-                    placeholder={showUsernamePlaceholder ? "Username" : ""}
+                    placeholder="Username"
                     required
                 />
                 <input
@@ -66,9 +56,7 @@ const Login = () => {
                     name="password"
                     value={credentials.password}
                     onChange={handleChange}
-                    onFocus={handlePasswordInputFocus}
-                    onBlur={handlePasswordInputBlur}
-                    placeholder={showPasswordPlaceholder ? "Password" : ""}
+                    placeholder="Password"
                     required
                 />
                 <button type="submit">Login</button>
