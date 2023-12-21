@@ -1,24 +1,28 @@
-import React, { useContext, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { authState } = useContext(AuthContext);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (authState.isLoggedIn && !allowedRoles.includes(authState.role)) {
-      const redirectPath =
-        authState.role === "ROLE_TEACHER" ? "/teacher" : "/student";
-      navigate(redirectPath);
-    }
-  }, [authState, navigate, allowedRoles]);
-
+  // Redirect to login page if not logged in
   if (!authState.isLoggedIn) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  // Allow access if the user has a role that is included in the allowedRoles
+  if (allowedRoles.includes(authState.role)) {
+    return children;
+  }
+
+  // If the user's role is not in the allowedRoles,
+  // but the user is a teacher, allow access to the admin route as well
+  if (authState.role === 'ROLE_TEACHER') {
+    return children;
+  }
+
+  // Redirect to a default or home page if the user does not have the right role
+  return <Navigate to="/teacher" replace />;
 };
 
 export default ProtectedRoute;
