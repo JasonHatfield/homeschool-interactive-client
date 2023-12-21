@@ -14,7 +14,7 @@ const TeacherDashboard = () => {
     const [assignments, setAssignments] = useState([]);
     const [fromDate, setFromDate] = useState(new Date(0));
     const [toDate, setToDate] = useState(new Date());
-    const [student, setStudent] = useState({ firstName: "", lastName: "", gradeLevel: "" });
+    const [student, setStudent] = useState({ id: 1, firstName: "", lastName: "", gradeLevel: "" });
     const [showModal, setShowModal] = useState(false);
     const [editableAssignment, setEditableAssignment] = useState({});
     const [subjects, setSubjects] = useState([]);
@@ -29,7 +29,7 @@ const TeacherDashboard = () => {
         try {
             const studentResponse = await apiClient.get("/students/1");
             const { firstName, lastName, gradeLevel } = studentResponse.data;
-            setStudent({ firstName, lastName, gradeLevel });
+            setStudent({ ...student, firstName, lastName, gradeLevel });
         } catch (error) {
             console.error("Error fetching student data:", error);
         }
@@ -64,14 +64,23 @@ const TeacherDashboard = () => {
     useEffect(() => {
         fetchStudentData();
         fetchSubjects();
-    }, [fetchStudentData, fetchSubjects]);
-
-    useEffect(() => {
         fetchAssignments();
-    }, [fetchAssignments]);
+    }, [fetchStudentData, fetchSubjects, fetchAssignments]);
 
     const handleInputChange = (e) => {
         setStudent({ ...student, [e.target.name]: e.target.value });
+    };
+
+    const updateStudentData = async () => {
+        try {
+            await apiClient.put(`/students/${student.id}`, student);
+        } catch (error) {
+            console.error("Error updating student data:", error);
+        }
+    };
+
+    const handleBlur = () => {
+        updateStudentData();
     };
 
     const handleEditAssignment = (assignment) => {
@@ -118,6 +127,7 @@ const TeacherDashboard = () => {
         setToDate(end);
     };
 
+
     return (
         <Container>
             <h1>Teacher Dashboard</h1>
@@ -126,11 +136,29 @@ const TeacherDashboard = () => {
             <Form>
                 <Form.Group>
                     <Form.Label>First Name</Form.Label>
-                    <Form.Control type="text" name="firstName" value={student.firstName} onChange={handleInputChange} />
+                    <Form.Control
+                        type="text"
+                        name="firstName"
+                        value={student.firstName}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                    />
                     <Form.Label>Last Name</Form.Label>
-                    <Form.Control type="text" name="lastName" value={student.lastName} onChange={handleInputChange} />
+                    <Form.Control
+                        type="text"
+                        name="lastName"
+                        value={student.lastName}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                    />
                     <Form.Label>Grade Level</Form.Label>
-                    <Form.Control as="select" name="gradeLevel" value={student.gradeLevel} onChange={handleInputChange}>
+                    <Form.Control
+                        as="select"
+                        name="gradeLevel"
+                        value={student.gradeLevel}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                    >
                         {[...Array(12).keys()].map(grade => (
                             <option key={grade + 1} value={grade + 1}>{grade + 1}</option>
                         ))}
