@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
             localStorage.setItem('userId', userId.toString());
-            setAuthToken(token);
+            setAuthToken(token); // This sets the token in the header for subsequent requests
             setAuthState({ isLoggedIn: true, role, token, userId });
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
