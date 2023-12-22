@@ -1,28 +1,34 @@
-import React, { useContext } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { authState } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // Redirect to login page if not logged in
+  useEffect(() => {
+    if (authState.isLoggedIn) {
+      // Teachers can access the admin route, and their own dashboard
+      if (authState.role === 'ROLE_TEACHER') {
+        return; // Allow teachers access to the route
+      }
+
+      // Redirect other roles if they don't have permission for the current route
+      if (!allowedRoles.includes(authState.role)) {
+        const redirectPath = authState.role === 'ROLE_STUDENT' ? '/student' : '/';
+        navigate(redirectPath);
+      }
+    } else {
+      // If not logged in, redirect to the login page
+      navigate("/");
+    }
+  }, [authState, navigate, allowedRoles]);
+
   if (!authState.isLoggedIn) {
     return <Navigate to="/" replace />;
   }
 
-  // Allow access if the user has a role that is included in the allowedRoles
-  if (allowedRoles.includes(authState.role)) {
-    return children;
-  }
-
-  // If the user's role is not in the allowedRoles,
-  // but the user is a teacher, allow access to the admin route as well
-  if (authState.role === 'ROLE_TEACHER') {
-    return children;
-  }
-
-  // Redirect to a default or home page if the user does not have the right role
-  return <Navigate to="/teacher" replace />;
+  return children;
 };
 
 export default ProtectedRoute;
