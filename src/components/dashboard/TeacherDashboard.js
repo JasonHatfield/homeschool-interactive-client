@@ -4,6 +4,7 @@ import apiClient from "../../services/apiClient";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import { AuthContext } from "../../context/AuthContext";
 
+// Define date filter options
 const DATE_FILTERS = {
     TODAY: "Today",
     THIS_WEEK: "ThisWeek",
@@ -11,6 +12,7 @@ const DATE_FILTERS = {
 };
 
 const TeacherDashboard = () => {
+    // State variables
     const [assignments, setAssignments] = useState([]);
     const [fromDate, setFromDate] = useState(new Date(0));
     const [toDate, setToDate] = useState(new Date());
@@ -21,10 +23,12 @@ const TeacherDashboard = () => {
 
     const { logout } = useContext(AuthContext);
 
+    // Handle logout
     const handleLogout = () => {
         logout();
     };
 
+    // Fetch student data from API
     const fetchStudentData = useCallback(async () => {
         try {
             const studentResponse = await apiClient.get("/students/1");
@@ -35,6 +39,7 @@ const TeacherDashboard = () => {
         }
     }, []);
 
+    // Fetch subjects from API
     const fetchSubjects = useCallback(async () => {
         try {
             const response = await apiClient.get("/subjects");
@@ -44,6 +49,7 @@ const TeacherDashboard = () => {
         }
     }, []);
 
+    // Fetch assignments within selected date range from API
     const fetchAssignments = useCallback(async () => {
         try {
             const response = await apiClient.get("/assignments/range", {
@@ -61,16 +67,19 @@ const TeacherDashboard = () => {
         }
     }, [fromDate, toDate]);
 
+    // Fetch data on component mount
     useEffect(() => {
         fetchStudentData();
         fetchSubjects();
         fetchAssignments();
     }, [fetchStudentData, fetchSubjects, fetchAssignments]);
 
+    // Handle input change for student data
     const handleInputChange = (e) => {
         setStudent({ ...student, [e.target.name]: e.target.value });
     };
 
+    // Update student data on blur
     const updateStudentData = async () => {
         try {
             await apiClient.put(`/students/${student.id}`, student);
@@ -79,19 +88,23 @@ const TeacherDashboard = () => {
         }
     };
 
+    // Handle blur event for student data inputs
     const handleBlur = () => {
         updateStudentData();
     };
 
+    // Handle edit assignment button click
     const handleEditAssignment = (assignment) => {
         setEditableAssignment(assignment);
         setShowModal(true);
     };
 
+    // Close modal
     const closeModal = () => {
         setShowModal(false);
     };
 
+    // Save assignment changes
     const saveAssignment = async () => {
         try {
             await apiClient.put(`/assignments/${editableAssignment.assignmentId}`, editableAssignment);
@@ -102,6 +115,7 @@ const TeacherDashboard = () => {
         }
     };
 
+    // Handle date filter button click
     const handleDateFilterButtonClick = (filterType) => {
         let start = new Date();
         let end = new Date();
@@ -126,7 +140,6 @@ const TeacherDashboard = () => {
         setFromDate(start);
         setToDate(end);
     };
-
 
     return (
         <Container>

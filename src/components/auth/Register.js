@@ -12,7 +12,7 @@ const Registration = () => {
 
     const { register } = useContext(AuthContext);
 
-    // Correctly used handleChange function
+    // Handle input changes
     const handleChange = (e) => {
         setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
     };
@@ -48,7 +48,7 @@ const Registration = () => {
                     type="text"
                     name="username"
                     value={userInfo.username}
-                    onChange={handleChange} // Correctly using handleChange
+                    onChange={handleChange} // Call handleChange on input change
                     placeholder="Username"
                     required
                 />
@@ -57,14 +57,14 @@ const Registration = () => {
                     type="password"
                     name="password"
                     value={userInfo.password}
-                    onChange={handleChange} // Correctly using handleChange
+                    onChange={handleChange} // Call handleChange on input change
                     placeholder="Password"
                     required
                 />
                 <select
                     name="role"
                     value={userInfo.role}
-                    onChange={handleChange}
+                    onChange={handleChange} // Call handleChange on select change
                     className="form-control" // Apply the same class used for input elements
                     required
                 >

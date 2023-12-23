@@ -5,13 +5,23 @@ import { AuthContext } from "../../context/AuthContext";
 
 const formatDate = (date) => date.toISOString().split("T")[0];
 
+/**
+ * Represents the student dashboard component.
+ * 
+ * @returns {JSX.Element} The student dashboard component.
+ */
 const StudentDashboard = () => {
+    // State variables
     const [assignments, setAssignments] = useState([]);
     const [studentData, setStudentData] = useState({ firstName: "", lastName: "", gradeLevel: null });
     const [currentTime, setCurrentTime] = useState(new Date());
     const { authState, logout } = useContext(AuthContext);
 
+    // Fetch student data and assignments on component mount
     useEffect(() => {
+        /**
+         * Fetches the student data from the server.
+         */
         const fetchStudentData = async () => {
             if (!authState.isLoggedIn) {
                 console.error("User not logged in");
@@ -25,6 +35,9 @@ const StudentDashboard = () => {
             }
         };
 
+        /**
+         * Fetches the assignments for the student from the server.
+         */
         const fetchAssignments = async () => {
             if (!authState.isLoggedIn) {
                 console.error("User not logged in");
@@ -42,11 +55,18 @@ const StudentDashboard = () => {
         fetchAssignments();
     }, [authState]);
 
+    // Update current time every second
     useEffect(() => {
         const intervalId = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(intervalId);
     }, []);
 
+    /**
+     * Handles toggling the status of an assignment.
+     * 
+     * @param {string} assignmentId - The ID of the assignment.
+     * @param {string} currentStatus - The current status of the assignment.
+     */
     const handleToggleAssignmentStatus = async (assignmentId, currentStatus) => {
         if (!assignmentId) {
             console.error("Undefined assignment ID");

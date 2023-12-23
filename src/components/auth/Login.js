@@ -18,12 +18,25 @@ const useRedirectAfterLogin = () => {
     }, [authState, navigate, location.pathname]);
 };
 
+/**
+ * Represents the Login component.
+ * This component is responsible for rendering the login form and handling user authentication.
+ */
 const Login = () => {
+    // State for storing the user's login credentials
     const [credentials, setCredentials] = useState({ username: "", password: "" });
+
+    // Accessing the login function from the AuthContext
     const { login } = useContext(AuthContext);
 
+    // Custom hook for redirecting the user after successful login
     useRedirectAfterLogin();
 
+    /**
+     * Handles the change event of the input fields.
+     * Updates the credentials state with the new values.
+     * @param {Object} e - The event object.
+     */
     const handleChange = (e) => {
         setCredentials(prevCredentials => ({
             ...prevCredentials,
@@ -31,6 +44,11 @@ const Login = () => {
         }));
     };
 
+    /**
+     * Handles the submit event of the login form.
+     * Performs validation and calls the login function.
+     * @param {Object} e - The event object.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!credentials.username || !credentials.password) {
