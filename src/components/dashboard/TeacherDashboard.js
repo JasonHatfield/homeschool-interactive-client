@@ -112,21 +112,26 @@ const TeacherDashboard = () => {
     };
 
     // Handle date filter button click
+// Handle date filter button click
+// Handle date filter button click
     const handleDateFilterButtonClick = filterType => {
         let start = new Date();
         let end = new Date();
         switch (filterType) {
             case DATE_FILTERS.TODAY:
-                start.setHours(0, 0, 0, 0);
-                end.setHours(23, 59, 59, 999);
+                start = new Date(start.setHours(0, 0, 0, 0));
+                end = new Date(start.setHours(23, 59, 59, 999)); // Set end of the day for 'Today'
                 break;
             case DATE_FILTERS.THIS_WEEK:
-                start = startOfWeek(start);
-                end = endOfWeek(end);
+                start = startOfWeek(start, { weekStartsOn: 1 });
+                end = endOfWeek(end, { weekStartsOn: 1 });
+                end = new Date(end.setDate(end.getDate() - 1));
+                end.setHours(23, 59, 59, 999); // Set end of the day for 'This Week'
                 break;
             case DATE_FILTERS.MONTH:
                 start = startOfMonth(start);
-                end = endOfMonth(end);
+                end = endOfMonth(start); // Change here to use 'start' as the reference date
+                end.setHours(23, 59, 59, 999); // Set end of the day for 'This Month'
                 break;
             default:
                 return;
