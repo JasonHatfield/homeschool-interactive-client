@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Table, Button, ButtonGroup, Form, Container, Modal, Row, Col } from "react-bootstrap";
 import apiClient from "../../services/apiClient";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
@@ -20,76 +20,86 @@ const TeacherDashboard = () => {
     const [showModal, setShowModal] = useState(false);
     const [editableAssignment, setEditableAssignment] = useState({});
     const [subjects, setSubjects] = useState([]);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     const { logout } = useContext(AuthContext);
+
+    // Fetch student data from API
+    const fetchStudentData = async () => {
+        try {
+            const { data } = await apiClient.get("/students/1");
+            setStudent(prevStudent => ({ ...prevStudent, ...data }));
+        } catch (error) {
+            console.error("Error fetching student data:", error);
+        }
+    };
+
+    // Fetch subjects from API
+    const fetchSubjects = async () => {
+        try {
+            const { data } = await apiClient.get("/subjects");
+            setSubjects(data);
+        } catch (error) {
+            console.error("Error fetching subjects:", error);
+        }
+    };
+
+    // Function to fetch initial assignments data
+    const fetchInitialAssignments = async () => {
+        try {
+            const { data } = await apiClient.get("/assignments");
+            const nonAcceptedAssignments = data
+                .filter(assignment => assignment.status !== 'Accepted')
+                .map(assignment => ({ ...assignment, dueDate: new Date(assignment.dueDate) }))
+                .sort((a, b) => a.dueDate - b.dueDate);
+
+            if (nonAcceptedAssignments.length) {
+                const oldestAssignmentDate = nonAcceptedAssignments[0].dueDate;
+                setFromDate(oldestAssignmentDate);
+                setToDate(new Date()); // Setting to today's date
+            }
+
+            setAssignments(nonAcceptedAssignments);
+        } catch (error) {
+            console.error("Error fetching initial assignments:", error);
+        }
+    };
+
+    // Fetch assignments within selected date range from API
+    const fetchAssignments = async (startDate, endDate) => {
+        try {
+            const { data } = await apiClient.get("/assignments/range", { params: { startDate, endDate } });
+            setAssignments(data.map(assignment => ({ ...assignment, dueDate: new Date(assignment.dueDate) })));
+        } catch (error) {
+            console.error("Error fetching assignments:", error);
+        }
+    };
+
+    // Fetch data on component mount
+    useEffect(() => {
+        // Fetch initial data only once
+        if (isInitialLoad) {
+            fetchInitialAssignments();
+            fetchStudentData();
+            fetchSubjects();
+            setIsInitialLoad(false);
+        } else {
+            // Fetch assignments whenever fromDate or toDate changes
+            const startDate = fromDate.toISOString();
+            const endDate = toDate.toISOString();
+            fetchAssignments(startDate, endDate);
+        }
+    }, [fromDate, toDate, isInitialLoad]);
 
     // Handle logout
     const handleLogout = () => {
         logout();
     };
 
-    // Fetch student data from API
-    const fetchStudentData = useCallback(async () => {
-        try {
-            const studentResponse = await apiClient.get("/students/1");
-            const { firstName, lastName, gradeLevel } = studentResponse.data;
-            setStudent({ ...student, firstName, lastName, gradeLevel });
-        } catch (error) {
-            console.error("Error fetching student data:", error);
-        }
-    }, []);
-
-    // Fetch subjects from API
-    const fetchSubjects = useCallback(async () => {
-        try {
-            const response = await apiClient.get("/subjects");
-            setSubjects(response.data);
-        } catch (error) {
-            console.error("Error fetching subjects:", error);
-        }
-    }, []);
-
-    // Fetch assignments within selected date range from API
-    const fetchAssignments = useCallback(async () => {
-        try {
-            const response = await apiClient.get("/assignments/range", {
-                params: {
-                    startDate: fromDate.toISOString(),
-                    endDate: toDate.toISOString(),
-                },
-            });
-            const filteredAssignments = response.data
-                .map(assignment => ({
-                    ...assignment,
-                    dueDate: new Date(assignment.dueDate)
-                }))
-                .filter(assignment =>
-                    assignment.dueDate <= new Date() && assignment.status !== 'Accepted'
-                )
-                .sort((a, b) => a.dueDate - b.dueDate);
-
-            if (filteredAssignments.length > 0) {
-                const oldestAssignmentDate = filteredAssignments[0].dueDate;
-                setFromDate(oldestAssignmentDate);
-                setToDate(new Date()); // Setting to today's date
-            }
-
-            setAssignments(filteredAssignments);
-        } catch (error) {
-            console.error("Error fetching assignments:", error);
-        }
-    }, [fromDate, toDate]);
-
-    // Fetch data on component mount
-    useEffect(() => {
-        fetchStudentData();
-        fetchSubjects();
-        fetchAssignments();
-    }, [fetchStudentData, fetchSubjects, fetchAssignments]);
-
     // Handle input change for student data
-    const handleInputChange = (e) => {
-        setStudent({ ...student, [e.target.name]: e.target.value });
+    const handleInputChange = e => {
+        const { name, value } = e.target;
+        setStudent(prevStudent => ({ ...prevStudent, [name]: value }));
     };
 
     // Update student data on blur
@@ -101,9 +111,29 @@ const TeacherDashboard = () => {
         }
     };
 
-    // Handle blur event for student data inputs
-    const handleBlur = () => {
-        updateStudentData();
+    // Handle date filter button click
+    const handleDateFilterButtonClick = filterType => {
+        let start = new Date();
+        let end = new Date();
+        switch (filterType) {
+            case DATE_FILTERS.TODAY:
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 59, 999);
+                break;
+            case DATE_FILTERS.THIS_WEEK:
+                start = startOfWeek(start);
+                end = endOfWeek(end);
+                break;
+            case DATE_FILTERS.MONTH:
+                start = startOfMonth(start);
+                end = endOfMonth(end);
+                break;
+            default:
+                return;
+        }
+        setFromDate(start);
+        setToDate(end);
+        fetchAssignments(start.toISOString(), end.toISOString());
     };
 
     // Handle edit assignment button click
@@ -128,32 +158,6 @@ const TeacherDashboard = () => {
         }
     };
 
-    // Handle date filter button click
-    const handleDateFilterButtonClick = (filterType) => {
-        let start = new Date();
-        let end = new Date();
-
-        switch (filterType) {
-            case DATE_FILTERS.TODAY:
-                start.setHours(0, 0, 0, 0);
-                end.setHours(23, 59, 59, 999);
-                break;
-            case DATE_FILTERS.THIS_WEEK:
-                start = startOfWeek(start);
-                end = endOfWeek(end);
-                break;
-            case DATE_FILTERS.MONTH:
-                start = startOfMonth(start);
-                end = endOfMonth(end);
-                break;
-            default:
-                break;
-        }
-
-        setFromDate(start);
-        setToDate(end);
-    };
-
     return (
         <Container>
             <h1>Teacher Dashboard</h1>
@@ -167,7 +171,7 @@ const TeacherDashboard = () => {
                         name="firstName"
                         value={student.firstName}
                         onChange={handleInputChange}
-                        onBlur={handleBlur}
+                        onBlur={updateStudentData}
                     />
                     <Form.Label>Last Name</Form.Label>
                     <Form.Control
@@ -175,7 +179,7 @@ const TeacherDashboard = () => {
                         name="lastName"
                         value={student.lastName}
                         onChange={handleInputChange}
-                        onBlur={handleBlur}
+                        onBlur={updateStudentData}
                     />
                     <Form.Label>Grade Level</Form.Label>
                     <Form.Control
@@ -183,7 +187,7 @@ const TeacherDashboard = () => {
                         name="gradeLevel"
                         value={student.gradeLevel}
                         onChange={handleInputChange}
-                        onBlur={handleBlur}
+                        onBlur={updateStudentData}
                     >
                         {[...Array(12).keys()].map(grade => (
                             <option key={grade + 1} value={grade + 1}>{grade + 1}</option>
