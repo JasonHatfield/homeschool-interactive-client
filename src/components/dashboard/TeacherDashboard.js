@@ -58,10 +58,23 @@ const TeacherDashboard = () => {
                     endDate: toDate.toISOString(),
                 },
             });
-            setAssignments(response.data.map(assignment => ({
-                ...assignment,
-                dueDate: new Date(assignment.dueDate)
-            })).sort((a, b) => a.dueDate - b.dueDate));
+            const filteredAssignments = response.data
+                .map(assignment => ({
+                    ...assignment,
+                    dueDate: new Date(assignment.dueDate)
+                }))
+                .filter(assignment =>
+                    assignment.dueDate <= new Date() && assignment.status !== 'Accepted'
+                )
+                .sort((a, b) => a.dueDate - b.dueDate);
+
+            if (filteredAssignments.length > 0) {
+                const oldestAssignmentDate = filteredAssignments[0].dueDate;
+                setFromDate(oldestAssignmentDate);
+                setToDate(new Date()); // Setting to today's date
+            }
+
+            setAssignments(filteredAssignments);
         } catch (error) {
             console.error("Error fetching assignments:", error);
         }
