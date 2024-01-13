@@ -157,11 +157,12 @@ const TeacherDashboard = () => {
         try {
             const updatedAssignment = {
                 ...editableAssignment,
+                dueDate: editableAssignment.dueDate.toISOString(),
                 subject: subjects.find(subj => subj.subjectId === editableAssignment.subjectId)
             };
 
             await apiClient.put(`/assignments/${editableAssignment.assignmentId}`, updatedAssignment);
-            setAssignments(assignments.map(a => a.assignmentId === editableAssignment.assignmentId ? updatedAssignment : a));
+            setAssignments(assignments.map(a => a.assignmentId === editableAssignment.assignmentId ? { ...a, dueDate: new Date(updatedAssignment.dueDate) } : a));
             closeModal();
         } catch (error) {
             console.error("Error saving assignment:", error);
@@ -266,7 +267,14 @@ const TeacherDashboard = () => {
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Status</Form.Label>
-                            <Form.Control as="select" value={editableAssignment.status || ""} onChange={(e) => setEditableAssignment({ ...editableAssignment, status: e.target.value })}>
+                            <Form.Control as="select" value={editableAssignment.status || ""}
+                                          onChange={(e) =>
+                                              setEditableAssignment(
+                                                  {
+                                                      ...editableAssignment,
+                                                      status: e.target.value
+                                                  })}
+                            >
                                 {["Incomplete", "Review", "Accepted"].map((status) => (
                                     <option key={status} value={status}>{status}</option>
                                 ))}
@@ -274,11 +282,25 @@ const TeacherDashboard = () => {
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Due Date</Form.Label>
-                            <Form.Control type="date" value={editableAssignment.dueDate ? new Date(editableAssignment.dueDate).toISOString().split('T')[0] : ""} onChange={(e) => setEditableAssignment({ ...editableAssignment, dueDate: new Date(e.target.value).toISOString() })} />
+                            <Form.Control type="date" value={editableAssignment.dueDate ?
+                                new Date(editableAssignment.dueDate).toISOString().split('T')[0] : ""}
+                                          onChange={(e) =>
+                                              setEditableAssignment(
+                                                  {
+                                                      ...editableAssignment,
+                                                      dueDate: new Date(e.target.value) })}
+                            />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Link</Form.Label>
-                            <Form.Control type="text" value={editableAssignment.link || ""} onChange={(e) => setEditableAssignment({ ...editableAssignment, link: e.target.value })} />
+                            <Form.Control type="text" value={editableAssignment.link || ""}
+                                          onChange={(e) =>
+                                              setEditableAssignment(
+                                                  {
+                                                  ...editableAssignment,
+                                                  link: e.target.value
+                                              })}
+                            />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
