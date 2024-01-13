@@ -143,7 +143,7 @@ const TeacherDashboard = () => {
 
     // Handle edit assignment button click
     const handleEditAssignment = (assignment) => {
-        setEditableAssignment(assignment);
+        setEditableAssignment({...assignment, subjectId: assignment.subject.subjectId});
         setShowModal(true);
     };
 
@@ -155,8 +155,13 @@ const TeacherDashboard = () => {
     // Save assignment changes
     const saveAssignment = async () => {
         try {
-            await apiClient.put(`/assignments/${editableAssignment.assignmentId}`, editableAssignment);
-            setAssignments(assignments.map(a => a.assignmentId === editableAssignment.assignmentId ? editableAssignment : a));
+            const updatedAssignment = {
+                ...editableAssignment,
+                subject: subjects.find(subj => subj.subjectId === editableAssignment.subjectId)
+            };
+
+            await apiClient.put(`/assignments/${editableAssignment.assignmentId}`, updatedAssignment);
+            setAssignments(assignments.map(a => a.assignmentId === editableAssignment.assignmentId ? updatedAssignment : a));
             closeModal();
         } catch (error) {
             console.error("Error saving assignment:", error);
@@ -249,7 +254,7 @@ const TeacherDashboard = () => {
                     <Form>
                         <Form.Group>
                             <Form.Label>Subject</Form.Label>
-                            <Form.Control as="select" value={editableAssignment.subjectId || ""} onChange={(e) => setEditableAssignment({ ...editableAssignment, subjectId: e.target.value })}>
+                            <Form.Control as="select" value={editableAssignment.subjectId || ""} onChange={(e) => setEditableAssignment({ ...editableAssignment, subjectId: Number(e.target.value) })}>
                                 {subjects.map((subject) => (
                                     <option key={subject.subjectId} value={subject.subjectId}>{subject.name}</option>
                                 ))}
