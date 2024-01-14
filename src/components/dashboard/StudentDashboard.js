@@ -73,6 +73,14 @@ const StudentDashboard = () => {
             return;
         }
 
+        // Check if the user is logged in and the token is available
+        if (!authState.isLoggedIn || !authState.token) {
+            console.error("User is not authenticated");
+            // Redirect to login or handle accordingly
+            logout(); // This should redirect to login
+            return;
+        }
+
         const newStatus = currentStatus === "Review" ? "Incomplete" : "Review";
         try {
             await apiClient.put(`/assignments/${assignmentId}/status?status=${newStatus}`);
@@ -83,6 +91,11 @@ const StudentDashboard = () => {
             );
         } catch (error) {
             console.error("Error updating assignment status:", error);
+            // Handle specific errors here (e.g., token expiry)
+            if (error.response && error.response.status === 401) {
+                // Handle token expiry or unauthorized access
+                logout(); // This should redirect to login
+            }
         }
     };
 
