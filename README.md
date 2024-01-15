@@ -1,70 +1,57 @@
-# Getting Started with Create React App
+# User Guide for Homeschool Interactive System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Purpose and Audience
+This guide is designed for **students and teachers** who use the Homeschool Interactive system. Teachers also serve as administrators within this system. The guide aims to provide comprehensive instructions on how to navigate and utilize the system effectively.
 
-## Available Scripts
+## System Overview
+The Homeschool Interactive system is an online educational platform designed to facilitate homeschooling. Key features include:
+- **Assignment Management**: Teachers can create, distribute, and grade assignments. Students can submit assignments online.
+- **Grade Tracking**: Both students and teachers can track academic progress through a grading system.
+- **Role-Based Access**: Different functionalities are available based on whether the user is a student or a teacher/administrator.
 
-In the project directory, you can run:
+## Installation and Setup
+Currently, the Homeschool Interactive system is web-based, requiring no specific installation. Users can access it through their preferred web browser. Ensure you have a stable internet connection for optimal performance.
 
-### `npm start`
+## Navigational Guide
+1. **Login/Registration**: Access the system through the homepage. New users must register first.
+2. **Dashboard**:
+    - **Students**: View assigned work, submit assignments, and track grades.
+    - **Teachers**: Create assignments, view student submissions,
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   grade assignments, and manage class details.
+3. **Creating Assignments (Teachers)**: Navigate to 'Assignments' and select 'Create Assignment'. Fill in the details and publish.
+4. **Submitting Assignments (Students)**: In the 'Assignments' section, choose an assignment, complete it, and use the 'Submit' button.
+5. **Grade Viewing**: Accessible from the dashboard for both students and teachers.
+6. **Account Settings**: Modify account details, change passwords, and update personal information.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## User Roles and Permissions
+- **Student**:
+    - Access and submit assignments.
+    - View grades and feedback.
+    - Update personal account information.
+- **Teacher/Administrator**:
+    - All student permissions.
+    - Create and grade assignments.
+    - Access to administrative functions such as student enrollment, subject management, and report generation.
 
-### `npm test`
+## Feature Use-Cases
+- **Submitting an Assignment (Student)**:
+    1. Go to 'Assignments'.
+    2. Select an assignment.
+    3. Complete the assignment by selecting the checkbox.
+- **Grading an Assignment (Teacher)**:
+    1. Navigate to 'Assignments'.
+    2. Open student submissions.
+    3. Review and update assignment status to accepted.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Troubleshooting and FAQ
+- **Q: What if I forget my password?**
+    - A: Use the 'Forgot Password' link on the login page to reset your password.
+- **Q: How do I change my role from student to teacher?**
+    - A: Contact system administrators for role changes.
+- **Q: Are my grades private?**
+    - A: Yes, grades are only visible to the respective student and their teachers.
+- **Q: I am experiencing technical difficulties, who can I contact?**
+    - A: Reach out to our support team via the contact details provided on the website.
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For more information or assistance, consult the 'Help' section within the platform or contact the support team directly.
